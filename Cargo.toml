@@ -1,0 +1,10 @@
+[package]
+name = "xmip-assign"
+version = "0.1.0"
+edition = "2024"
+license = "MIT"
+repository = "https://github.com/IlleNilsson/xmip-assign"
+description = "Xmip value assignment contracts."
+
+[dependencies]
+xmip-context = { git = "https://github.com/IlleNilsson/xmip-context", rev = "a6220c984c4ec4edffbcc45d578a9a98d0b2242a" }
