@@ -2,12 +2,12 @@
 [workspace]
 
 [package]
-name = "xmip-assign"
+name = "xmip-core-assign"
 version = "0.1.0"
 edition = "2024"
 license = "AGPL-3.0-or-later"
-repository = "https://github.com/IlleNilsson/xmip-assign"
+repository = "https://github.com/IlleNilsson/xmip-core-assign"
 description = "Xmip value assignment contracts."
 
 [dependencies]
-xmip-context = { git = "https://github.com/IlleNilsson/xmip-context", rev = "a6220c984c4ec4edffbcc45d578a9a98d0b2242a" }
+xmip-context = { package = "xmip-core-context", git = "https://github.com/IlleNilsson/xmip-core-context", branch = "main" }
