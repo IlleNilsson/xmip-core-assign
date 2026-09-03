@@ -18,7 +18,9 @@ pub fn apply(context: MessageContext, assignments: &[Assignment]) -> MessageCont
     assignments.iter().fold(context, |current, assignment| {
         let value = match &assignment.value {
             AssignmentValue::Literal(value) => value.clone(),
-            AssignmentValue::Context(key) => current.get(key).cloned().unwrap_or(ContextValue::Null),
+            AssignmentValue::Context(key) => {
+                current.get(key).cloned().unwrap_or(ContextValue::Null)
+            }
         };
         current.with_value(assignment.target_key.clone(), value)
     })
