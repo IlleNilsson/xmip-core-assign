@@ -1,6 +1,6 @@
 #![forbid(unsafe_code)]
 
-use xmip_context::{ContextValue, MessageContext};
+use context::{ContextValue, MessageContext};
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum AssignmentValue {
