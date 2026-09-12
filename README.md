@@ -1,2 +1,2 @@
-# xmip-assign
+# xmip-core-assign
 Performs Xmip value assignments.
