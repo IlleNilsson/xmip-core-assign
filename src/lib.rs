@@ -1,10 +1,12 @@
 #![forbid(unsafe_code)]
 
-use context::{ContextValue, MessageContext};
+use context::MessageContext;
+
+use xcore::ScalarValue;
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum AssignmentValue {
-    Literal(ContextValue),
+    Literal(ScalarValue),
     Context(String),
 }
 
@@ -18,9 +20,7 @@ pub fn apply(context: MessageContext, assignments: &[Assignment]) -> MessageCont
     assignments.iter().fold(context, |current, assignment| {
         let value = match &assignment.value {
             AssignmentValue::Literal(value) => value.clone(),
-            AssignmentValue::Context(key) => {
-                current.get(key).cloned().unwrap_or(ContextValue::Null)
-            }
+            AssignmentValue::Context(key) => current.get(key).cloned().unwrap_or(ScalarValue::Null),
         };
         current.with_value(assignment.target_key.clone(), value)
     })
@@ -33,13 +33,13 @@ mod tests {
     #[test]
     fn a_literal_is_set_and_a_context_value_is_copied() {
         let context =
-            MessageContext::new().with_value("source", ContextValue::Text("edi".to_string()));
+            MessageContext::new().with_value("source", ScalarValue::Text("edi".to_string()));
         let assigned = apply(
             context,
             &[
                 Assignment {
                     target_key: "priority".to_string(),
-                    value: AssignmentValue::Literal(ContextValue::Integer(1)),
+                    value: AssignmentValue::Literal(ScalarValue::Integer(1)),
                 },
                 Assignment {
                     target_key: "origin".to_string(),
@@ -47,10 +47,10 @@ mod tests {
                 },
             ],
         );
-        assert_eq!(assigned.get("priority"), Some(&ContextValue::Integer(1)));
+        assert_eq!(assigned.get("priority"), Some(&ScalarValue::Integer(1)));
         assert_eq!(
             assigned.get("origin"),
-            Some(&ContextValue::Text("edi".to_string()))
+            Some(&ScalarValue::Text("edi".to_string()))
         );
     }
 
@@ -63,6 +63,6 @@ mod tests {
                 value: AssignmentValue::Context("absent".to_string()),
             }],
         );
-        assert_eq!(assigned.get("copy"), Some(&ContextValue::Null));
+        assert_eq!(assigned.get("copy"), Some(&ScalarValue::Null));
     }
 }
