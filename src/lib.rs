@@ -16,13 +16,24 @@ pub struct Assignment {
     pub value: AssignmentValue,
 }
 
+/// Apply `assignments` in order: a literal is set, and a context value is
+/// copied. A source that is missing, or holds `Null`, is absent — one thing,
+/// as a filter reads it (ADR-0046, amendment 2026-09-24) — so it assigns
+/// nothing and the target is left as it was.
+#[must_use]
 pub fn apply(context: MessageContext, assignments: &[Assignment]) -> MessageContext {
     assignments.iter().fold(context, |current, assignment| {
         let value = match &assignment.value {
-            AssignmentValue::Literal(value) => value.clone(),
-            AssignmentValue::Context(key) => current.get(key).cloned().unwrap_or(ScalarValue::Null),
+            AssignmentValue::Literal(value) => Some(value.clone()),
+            AssignmentValue::Context(key) => current
+                .get(key)
+                .filter(|value| **value != ScalarValue::Null)
+                .cloned(),
         };
-        current.with_value(assignment.target_key.clone(), value)
+        match value {
+            Some(value) => current.with_value(assignment.target_key.clone(), value),
+            None => current,
+        }
     })
 }
 
@@ -55,14 +66,29 @@ mod tests {
     }
 
     #[test]
-    fn a_missing_context_key_assigns_null_rather_than_nothing() {
+    fn a_missing_or_null_source_assigns_nothing() {
+        let context = MessageContext::new()
+            .with_value("note", ScalarValue::Null)
+            .with_value("kept", ScalarValue::Text("as it was".to_string()));
+        let copy = |target: &str, source: &str| Assignment {
+            target_key: target.to_string(),
+            value: AssignmentValue::Context(source.to_string()),
+        };
+
         let assigned = apply(
-            MessageContext::new(),
-            &[Assignment {
-                target_key: "copy".to_string(),
-                value: AssignmentValue::Context("absent".to_string()),
-            }],
+            context,
+            &[
+                copy("copy", "absent"),
+                copy("noted", "note"),
+                copy("kept", "absent"),
+            ],
         );
-        assert_eq!(assigned.get("copy"), Some(&ScalarValue::Null));
+
+        assert!(!assigned.contains_key("copy"), "missing is absent");
+        assert!(!assigned.contains_key("noted"), "Null is absent");
+        assert_eq!(
+            assigned.get("kept"),
+            Some(&ScalarValue::Text("as it was".to_string()))
+        );
     }
 }
