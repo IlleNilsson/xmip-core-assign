@@ -9,6 +9,12 @@ the assignments and hands back the result. A source value that is missing or
 Assignment belongs to a Work Process alone; a Receive Port or a Send Port
 transforms but does not assign (`runtime-model.md` section 22). Assignment
 creates a new Message generation, as transformation does; routing does not.
+A Work Process assigns with a BPMN task's `dataOutputAssociation`
+assignments — `from` a literal or a context name, `to` a context name — which
+its program carries as these `Assignment`s and its runtime applies with
+`apply` (`xmip-core-process`; ADR-0066, amendment 2026-10-22). The owner,
+2026-10-22: *Assignments are not configured, they are done by primarily Work
+Processes.*
 
 `doc/architecture/runtime-model.md` sections 3 and 22 govern it;
 `architecture.toml` carries the maturity.
