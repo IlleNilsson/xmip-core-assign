@@ -17,4 +17,4 @@ its program carries as these `Assignment`s and its runtime applies with
 Processes.*
 
 `doc/architecture/runtime-model.md` sections 3 and 22 govern it;
-`architecture.toml` carries the maturity.
+`architecture.xmip` carries the maturity.
